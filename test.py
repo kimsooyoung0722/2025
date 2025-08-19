@@ -115,17 +115,31 @@ else:
             })
 
     df = pd.DataFrame(data)
-    st.dataframe(df, use_container_width=True, hide_index=True)
+
+    # 필터 추가
+    st.sidebar.markdown("### 필터")
+    selected_countries = st.sidebar.multiselect("국가 선택", options=df["국가"].unique(), default=df["국가"].unique())
+    keyword = st.sidebar.text_input("키워드 검색 (과정명/설명)")
+
+    filtered_df = df[df["국가"].isin(selected_countries)]
+
+    if keyword:
+        filtered_df = filtered_df[
+            filtered_df["과정명"].str.contains(keyword, case=False) |
+            filtered_df["설명"].str.contains(keyword, case=False)
+        ]
+
+    st.dataframe(filtered_df, use_container_width=True, hide_index=True)
 
     st.download_button(
         "CSV 다운로드",
-        data=df.to_csv(index=False).encode("utf-8-sig"),
-        file_name="world_culture_courses.csv",
+        data=filtered_df.to_csv(index=False).encode("utf-8-sig"),
+        file_name="world_culture_courses_filtered.csv",
         mime="text/csv",
         use_container_width=True,
     )
 
-    st.bar_chart(df["국가"].value_counts())
+    st.bar_chart(filtered_df["국가"].value_counts())
 
 st.markdown("---")
 st.caption("© 2025 World Culture Curriculum Recommender • 예시 링크는 대체 URL입니다.")
