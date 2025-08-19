@@ -36,3 +36,4 @@ if st.button("추천 받기"):
     for course in courses[country]["recommendations"]:
         st.markdown(f"**{course['title']}**  \n{course['desc']}  \n[자세히 보기]({course['link']})")
 
+
