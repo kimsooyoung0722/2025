@@ -142,7 +142,11 @@ else:
         use_container_width=True,
     )
 
+    st.markdown("### 📊 국가별 과정 수")
     st.bar_chart(filtered_df["국가"].value_counts())
+
+    st.markdown("### 📊 카테고리별 과정 수")
+    st.bar_chart(filtered_df["카테고리"].value_counts())
 
 st.markdown("---")
 st.caption("© 2025 World Culture Curriculum Recommender • 예시 링크는 대체 URL입니다.")
