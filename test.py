@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 # ----------------------------
 # 국가별 문화 & 교육과정 데이터
@@ -84,21 +85,51 @@ st.set_page_config(page_title="세계 문화 기반 교육과정 추천", page_i
 st.title("세계 문화 기반 맞춤형 교육과정 추천")
 st.caption("관심 있는 나라를 선택하면, 그 나라의 문화적 특징에 맞춘 교육과정을 추천합니다.")
 
-country = st.selectbox("관심 있는 나라를 선택하세요:", list(courses.keys()))
+mode = st.sidebar.radio("모드 선택", ["추천 받기", "대시보드"], index=0)
 
-if st.button("추천 받기"):
-    st.subheader(f"선택한 나라: {country}")
-    st.write(courses[country]["description"])
+if mode == "추천 받기":
+    country = st.selectbox("관심 있는 나라를 선택하세요:", list(courses.keys()))
 
-    st.markdown("### 추천 교육과정")
-    for course in courses[country]["recommendations"]:
-        with st.container(border=True):
-            st.markdown(f"**{course['title']}**  ")
-            st.markdown(course['desc'])
-            st.markdown(f"[자세히 보기]({course['link']})")
+    if st.button("추천 받기"):
+        st.subheader(f"선택한 나라: {country}")
+        st.write(courses[country]["description"])
+
+        st.markdown("### 추천 교육과정")
+        for course in courses[country]["recommendations"]:
+            with st.container(border=True):
+                st.markdown(f"**{course['title']}**  ")
+                st.markdown(course['desc'])
+                st.markdown(f"[자세히 보기]({course['link']})")
+
+else:
+    st.subheader("🌍 국가별 교육과정 대시보드")
+
+    data = []
+    for country, info in courses.items():
+        for rec in info["recommendations"]:
+            data.append({
+                "국가": country,
+                "과정명": rec["title"],
+                "설명": rec["desc"],
+                "링크": rec["link"]
+            })
+
+    df = pd.DataFrame(data)
+    st.dataframe(df, use_container_width=True, hide_index=True)
+
+    st.download_button(
+        "CSV 다운로드",
+        data=df.to_csv(index=False).encode("utf-8-sig"),
+        file_name="world_culture_courses.csv",
+        mime="text/csv",
+        use_container_width=True,
+    )
+
+    st.bar_chart(df["국가"].value_counts())
 
 st.markdown("---")
 st.caption("© 2025 World Culture Curriculum Recommender • 예시 링크는 대체 URL입니다.")
+
 
 
 
